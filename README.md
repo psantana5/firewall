@@ -46,7 +46,7 @@
     <li>🔨 Build the firewall program by compiling the <code>firewall.cpp</code> source code:</li>
   </ol>
 
-  <pre><code>g++ main.cpp -o firewall.exe</code></pre>
+  <pre><code>g++ -o firewall main.cpp -lssl -lcrypto </code></pre>
 
   <ol start="6">
     <li>▶️ Run the compiled firewall program:</li>
