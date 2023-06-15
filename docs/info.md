@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Firewall Rules</title>
-</head>
 <body>
   <h1>Firewall Rules</h1>
 
