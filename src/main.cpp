@@ -1,277 +1,307 @@
 #include <iostream>
-#include <limits>
-#include <pcap.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <netinet/if_ether.h>
+#include <string>
+#include <vector>
 
-// Function prototypes
-void displayMainMenu();
-int getValidChoice(int min, int max);
-void handleMainMenuChoice(int choice);
-void displayFilteringMenu();
-void handleFilteringMenuChoice(int choice);
-void displayRuleManagementMenu();
-void handleRuleManagementMenuChoice(int choice);
-void displaySecurityMenu();
-void handleSecurityMenuChoice(int choice);
+struct FirewallRule {
+    std::string ipAddress;
+    bool allow;
+};
 
-// Function to display the main menu
-void displayMainMenu()
-{
-    std::cout << "========== Firewall Menu ==========\n";
-    std::cout << "1. Packet Filtering\n";
-    std::cout << "2. Rule Management\n";
-    std::cout << "3. Security Management\n";
-    std::cout << "4. Exit\n";
-    std::cout << "===================================\n";
+bool isPacketAllowed(const std::string& ipAddress, const std::vector<FirewallRule>& firewallRules) {
+    for (const auto& rule : firewallRules) {
+        if (rule.ipAddress == ipAddress) {
+            return rule.allow;
+        }
+    }
+    return false;
+}
+
+void addFirewallRule(std::vector<FirewallRule>& firewallRules) {
+    std::string ipAddress;
+    char choice;
+
+    std::cout << "Enter IP address: ";
+    std::cin >> ipAddress;
+
+    std::cout << "Allow or block? (a/b): ";
+    std::cin >> choice;
+
+    bool allow = (choice == 'a' || choice == 'A');
+    firewallRules.push_back({ipAddress, allow});
+
+    std::cout << "Firewall rule added successfully." << std::endl;
+}
+
+void removeFirewallRule(std::vector<FirewallRule>& firewallRules) {
+    std::string ipAddress;
+
+    std::cout << "Enter IP address to remove: ";
+    std::cin >> ipAddress;
+
+    for (auto it = firewallRules.begin(); it != firewallRules.end(); ++it) {
+        if (it->ipAddress == ipAddress) {
+            firewallRules.erase(it);
+            std::cout << "Firewall rule removed successfully." << std::endl;
+            return;
+        }
+    }
+
+    std::cout << "Firewall rule not found for the given IP address." << std::endl;
+}
+
+void clearFirewallRules(std::vector<FirewallRule>& firewallRules) {
+    firewallRules.clear();
+    std::cout << "All firewall rules cleared." << std::endl;
+}
+
+void printFirewallRules(const std::vector<FirewallRule>& firewallRules) {
+    std::cout << "Firewall Rules:" << std::endl;
+    for (const auto& rule : firewallRules) {
+        std::string action = rule.allow ? "Allow" : "Block";
+        std::cout << "IP: " << rule.ipAddress << "  Action: " << action << std::endl;
+    }
+}
+
+void countFirewallRules(const std::vector<FirewallRule>& firewallRules) {
+    std::cout << "Total firewall rules: " << firewallRules.size() << std::endl;
+}
+
+void searchFirewallRule(const std::vector<FirewallRule>& firewallRules) {
+    std::string ipAddress;
+
+    std::cout << "Enter IP address to search: ";
+    std::cin >> ipAddress;
+
+    for (const auto& rule : firewallRules) {
+        if (rule.ipAddress == ipAddress) {
+            std::string action = rule.allow ? "Allow" : "Block";
+            std::cout << "Firewall rule found for IP: " << rule.ipAddress << "  Action: " << action << std::endl;
+            return;
+        }
+    }
+
+    std::cout << "No firewall rule found for the given IP address." << std::endl;
+}
+
+void blockAllTraffic(std::vector<FirewallRule>& firewallRules) {
+    firewallRules.clear();
+    firewallRules.push_back({"0.0.0.0", false});
+    std::cout << "All traffic blocked. Firewall rules updated." << std::endl;
+}
+
+void allowAllTraffic(std::vector<FirewallRule>& firewallRules) {
+    firewallRules.clear();
+    firewallRules.push_back({"0.0.0.0", true});
+    std::cout << "All traffic allowed. Firewall rules updated." << std::endl;
+}
+
+void blockTrafficFromRange(std::vector<FirewallRule>& firewallRules) {
+    std::string startIp, endIp;
+
+    std::cout << "Enter starting IP address: ";
+    std::cin >> startIp;
+
+    std::cout << "Enter ending IP address: ";
+    std::cin >> endIp;
+
+    firewallRules.push_back({startIp, false});
+    firewallRules.push_back({endIp, false});
+
+    std::cout << "Blocked traffic from IP range " << startIp << " to " << endIp << ". Firewall rules updated." << std::endl;
+}
+
+void allowTrafficFromRange(std::vector<FirewallRule>& firewallRules) {
+    std::string startIp, endIp;
+
+    std::cout << "Enter starting IP address: ";
+    std::cin >> startIp;
+
+    std::cout << "Enter ending IP address: ";
+    std::cin >> endIp;
+
+    firewallRules.push_back({startIp, true});
+    firewallRules.push_back({endIp, true});
+
+    std::cout << "Allowed traffic from IP range " << startIp << " to " << endIp << ". Firewall rules updated." << std::endl;
+}
+
+void blockTrafficByProtocol(std::vector<FirewallRule>& firewallRules) {
+    std::string protocol;
+
+    std::cout << "Enter protocol to block: ";
+    std::cin >> protocol;
+
+    firewallRules.push_back({protocol, false});
+
+    std::cout << "Blocked traffic for protocol " << protocol << ". Firewall rules updated." << std::endl;
+}
+
+void allowTrafficByProtocol(std::vector<FirewallRule>& firewallRules) {
+    std::string protocol;
+
+    std::cout << "Enter protocol to allow: ";
+    std::cin >> protocol;
+
+    firewallRules.push_back({protocol, true});
+
+    std::cout << "Allowed traffic for protocol " << protocol << ". Firewall rules updated." << std::endl;
+}
+
+void blockTrafficByPort(std::vector<FirewallRule>& firewallRules) {
+    std::string port;
+
+    std::cout << "Enter port to block: ";
+    std::cin >> port;
+
+    firewallRules.push_back({port, false});
+
+    std::cout << "Blocked traffic for port " << port << ". Firewall rules updated." << std::endl;
+}
+
+void allowTrafficByPort(std::vector<FirewallRule>& firewallRules) {
+    std::string port;
+
+    std::cout << "Enter port to allow: ";
+    std::cin >> port;
+
+    firewallRules.push_back({port, true});
+
+    std::cout << "Allowed traffic for port " << port << ". Firewall rules updated." << std::endl;
+}
+
+void printMainMenu() {
+    std::cout << "=======================" << std::endl;
+    std::cout << "Firewall Menu" << std::endl;
+    std::cout << "=======================" << std::endl;
+    std::cout << "1. Manage Firewall Rules" << std::endl;
+    std::cout << "2. Block/Allow All Traffic" << std::endl;
+    std::cout << "3. Exit" << std::endl;
+    std::cout << "=======================" << std::endl;
     std::cout << "Enter your choice: ";
 }
 
-// Function to validate and retrieve a choice within a given range
-int getValidChoice(int min, int max)
-{
-    int choice;
-    while (true)
-    {
-        std::cout << "Enter your choice: ";
-        std::cin >> choice;
+void printFirewallRulesMenu() {
+    std::cout << "=======================" << std::endl;
+    std::cout << "Manage Firewall Rules" << std::endl;
+    std::cout << "=======================" << std::endl;
+    std::cout << "1. Add Firewall Rule" << std::endl;
+    std::cout << "2. Remove Firewall Rule" << std::endl;
+    std::cout << "3. Clear All Rules" << std::endl;
+    std::cout << "4. Print Rules" << std::endl;
+    std::cout << "5. Count Rules" << std::endl;
+    std::cout << "6. Search Rule by IP" << std::endl;
+    std::cout << "7. Go Back" << std::endl;
+    std::cout << "=======================" << std::endl;
+    std::cout << "Enter your choice: ";
+}
 
-        if (std::cin.fail() || choice < min || choice > max)
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid choice. Please try again.\n";
+void printBlockAllowMenu() {
+    std::cout << "=======================" << std::endl;
+    std::cout << "Block/Allow All Traffic" << std::endl;
+    std::cout << "=======================" << std::endl;
+    std::cout << "1. Block All Traffic" << std::endl;
+    std::cout << "2. Allow All Traffic" << std::endl;
+    std::cout << "3. Block Traffic by IP Range" << std::endl;
+    std::cout << "4. Allow Traffic by IP Range" << std::endl;
+    std::cout << "5. Block Traffic by Protocol" << std::endl;
+    std::cout << "6. Allow Traffic by Protocol" << std::endl;
+    std::cout << "7. Block Traffic by Port" << std::endl;
+    std::cout << "8. Allow Traffic by Port" << std::endl;
+    std::cout << "9. Go Back" << std::endl;
+    std::cout << "=======================" << std::endl;
+    std::cout << "Enter your choice: ";
+}
+
+int main() {
+    std::vector<FirewallRule> firewallRules;
+
+    int mainChoice;
+    int firewallChoice;
+    int blockAllowChoice;
+
+    do {
+        printMainMenu();
+        std::cin >> mainChoice;
+
+        switch (mainChoice) {
+            case 1:
+                do {
+                    printFirewallRulesMenu();
+                    std::cin >> firewallChoice;
+
+                    switch (firewallChoice) {
+                        case 1:
+                            addFirewallRule(firewallRules);
+                            break;
+                        case 2:
+                            removeFirewallRule(firewallRules);
+                            break;
+                        case 3:
+                            clearFirewallRules(firewallRules);
+                            break;
+                        case 4:
+                            printFirewallRules(firewallRules);
+                            break;
+                        case 5:
+                            countFirewallRules(firewallRules);
+                            break;
+                        case 6:
+                            searchFirewallRule(firewallRules);
+                            break;
+                        case 7:
+                            break;
+                        default:
+                            std::cout << "Invalid choice. Please try again." << std::endl;
+                            break;
+                    }
+                } while (firewallChoice != 7);
+                break;
+            case 2:
+                do {
+                    printBlockAllowMenu();
+                    std::cin >> blockAllowChoice;
+
+                    switch (blockAllowChoice) {
+                        case 1:
+                            blockAllTraffic(firewallRules);
+                            break;
+                        case 2:
+                            allowAllTraffic(firewallRules);
+                            break;
+                        case 3:
+                            blockTrafficFromRange(firewallRules);
+                            break;
+                        case 4:
+                            allowTrafficFromRange(firewallRules);
+                            break;
+                        case 5:
+                            blockTrafficByProtocol(firewallRules);
+                            break;
+                        case 6:
+                            allowTrafficByProtocol(firewallRules);
+                            break;
+                        case 7:
+                            blockTrafficByPort(firewallRules);
+                            break;
+                        case 8:
+                            allowTrafficByPort(firewallRules);
+                            break;
+                        case 9:
+                            break;
+                        default:
+                            std::cout << "Invalid choice. Please try again." << std::endl;
+                            break;
+                    }
+                } while (blockAllowChoice != 9);
+                break;
+            case 3:
+                std::cout << "Exiting..." << std::endl;
+                break;
+            default:
+                std::cout << "Invalid choice. Please try again." << std::endl;
+                break;
         }
-        else
-        {
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            break;
-        }
-    }
-
-    return choice;
-}
-
-// Function to handle user input and navigate main menu options
-void handleMainMenuChoice(int choice)
-{
-    switch (choice)
-    {
-        case 1:
-            displayFilteringMenu();
-            break;
-        case 2:
-            displayRuleManagementMenu();
-            break;
-        case 3:
-            displaySecurityMenu();
-            break;
-        case 4:
-            std::cout << "Exiting the Firewall Program. Goodbye!\n";
-            // Implement any cleanup or necessary steps before exiting
-            exit(0);
-        default:
-            std::cout << "Invalid choice. Please try again.\n";
-    }
-}
-
-// Function to display the filtering menu
-void displayFilteringMenu()
-{
-    std::cout << "========== Filtering Menu ==========\n";
-    std::cout << "1. Packet Filtering\n";
-    std::cout << "2. Deep Packet Inspection\n";
-    std::cout << "3. Exit to Main Menu\n";
-    std::cout << "====================================\n";
-}
-
-// Function to handle user input and navigate filtering menu options
-void handleFilteringMenuChoice(int choice)
-{
-    switch (choice)
-    {
-        case 1:
-            std::cout << "Packet Filtering feature selected.\n";
-            void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char){
-                struct ether_header *eth_header;
-                eth_header = (struct ether_header *)pkt_data;
-                printf("Source MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
-                  eth_header->ether_shost[0], eth_header->ether_shost[1],
-                  eth_header->ether_shost[2], eth_header->ether_shost[3],
-                  eth_header->ether_shost[4], eth_header->ether_shost[5]);
-                printf("Destination MAC: %02x:%02x:%02x:%02x:%02x:%02x\n ",
-                  eth_header->ether_dhost[0], eth_header->ether_dhost[1],
-                  eth_header->ether_dhost[2], eth_header->ether_dhost[3],
-                  eth_header->ether_dhost[4], eth_header->ether_dhost[5]);
-                printf("Type: %hu\n", eth_header->ether_type);
-            }
-
-            int main(int argc, char **argv){
-                char *dev = argv[1];
-                char errbuf [PCAP_ERRBUF_SIZE];
-                pcap_t *handle;
-                handle = pcap_open_live(dev, BUFSIZ, 1, 100, errrbuf);
-                if (handle == NULL){
-                    fprintf(strderr, "Couldn't open device %s; %s,\n", dev, errbuf);
-                    return (2);
-                }
-                int choice;
-                std::cout << "Enter your choice: ";
-                std::cin >> choice;
-
-                pcap_loop(handle, 0, packet_handler, NULL);
-                pcap_close(handle);
-                return(0);
-            
-            }
-            break;
-        case 2:
-            std::cout << "Deep Packet Inspection feature selected.\n";
-            // Implement the logic for deep packet inspection
-            break;
-        case 3:
-            std::cout << "Returning to the main menu.\n";
-            break;
-        default:
-            std::cout << "Invalid choice. Please try again.\n";
-    }
-}
-
-// Function to display the rule management menu
-void displayRuleManagementMenu()
-{
-    std::cout << "========== Rule Management Menu ==========\n";
-    std::cout << "1. Create Rule\n";
-    std::cout << "2. Delete Rule\n";
-    std::cout << "3. Exit to Main Menu\n";
-    std::cout << "=========================================\n";
-}
-
-// Function to handle user input and navigate rule management menu options
-void handleRuleManagementMenuChoice(int choice)
-{
-    switch (choice)
-    {
-        case 1:
-            std::cout << "Create Rule feature selected.\n";
-            // Implement the logic for rule creation
-            break;
-        case 2:
-            std::cout << "Delete Rule feature selected.\n";
-            // Implement the logic for rule deletion
-            break;
-        case 3:
-            std::cout << "Returning to the main menu.\n";
-            break;
-        default:
-            std::cout << "Invalid choice. Please try again.\n";
-    }
-}
-
-// Function to display the security menu
-void displaySecurityMenu()
-{
-    std::cout << "========== Security Management Menu ==========\n";
-    std::cout << "1. User Authentication Menu\n";
-    std::cout << "2. Logs Analyzer\n";
-    std::cout << "3. Availability Settings\n";
-    std::cout << "4. VPN Management\n";
-    std::cout << "5. Threat Prevention\n";
-    std::cout << "6. Exit to Main Menu\n";
-    std::cout << "============================================\n";
-}
-
-// Function to handle user input and navigate security menu options
-void handleSecurityMenuChoice(int choice)
-{
-    switch (choice)
-    {
-        case 1:
-            std::cout << "User Authentication Menu feature selected.\n";
-            // Implement the logic for user authentication menu
-            break;
-        case 2:
-            std::cout << "Logs Analyzer feature selected.\n";
-            // Implement the logic for logs analyzer
-            break;
-        case 3:
-            std::cout << "Availability Settings feature selected.\n";
-            // Implement the logic for availability settings
-            break;
-        case 4:
-            std::cout << "VPN Management feature selected.\n";
-            // Implement the logic for VPN management
-            break;
-        case 5:
-            std::cout << "Threat Prevention feature selected.\n";
-            // Implement the logic for threat prevention
-            break;
-        case 6:
-            std::cout << "Returning to the main menu.\n";
-            break;
-        default:
-            std::cout << "Invalid choice. Please try again.\n";
-    }
-}
-
-int main()
-{
-    int choice;
-
-    while (true)
-    {
-        displayMainMenu();
-        choice = getValidChoice(1, 4);
-
-        handleMainMenuChoice(choice);
-
-        if (choice == 1)
-        {
-            while (true)
-            {
-                displayFilteringMenu();
-                choice = getValidChoice(1, 3);
-
-                handleFilteringMenuChoice(choice);
-
-                if (choice == 3)
-                    break; // Return to the main menu
-            }
-        }
-        else if (choice == 2)
-        {
-            while (true)
-            {
-                displayRuleManagementMenu();
-                choice = getValidChoice(1, 3);
-
-                handleRuleManagementMenuChoice(choice);
-
-                if (choice == 3)
-                    break; // Return to the main menu
-            }
-        }
-        else if (choice == 3)
-        {
-            while (true)
-            {
-                displaySecurityMenu();
-                choice = getValidChoice(1, 6);
-
-                handleSecurityMenuChoice(choice);
-
-                if (choice == 6)
-                    break; // Return to the main menu
-            }
-        }
-
-        std::cout << "Press Enter to continue...";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cin.get(); // Wait for Enter key before clearing the screen or displaying the menu again
-        system("clear"); // Use "cls" instead of "clear" on Windows
-    }
+    } while (mainChoice != 3);
 
     return 0;
 }
