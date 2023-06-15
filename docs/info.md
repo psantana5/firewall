@@ -1,22 +1,26 @@
 # Firewall Project
 
-This firewall project aims to provide network security by filtering and controlling incoming and outgoing network traffic based on defined rules. The firewall is implemented in C++.
+This firewall project is implemented in C++ and aims to provide network security by filtering and controlling incoming and outgoing network traffic based on defined rules.
 
 ## Code Structure
 
 The firewall code is organized into the following components:
 
-- **Packet Handling**: Responsible for capturing and analyzing network packets. It extracts relevant information such as source/destination IP addresses, port numbers, and protocol types.
+### Packet Handling
+Responsible for capturing and analyzing network packets. It extracts relevant information such as source/destination IP addresses, port numbers, and protocol types.
 
-- **Rule Management**: Implements a system to define, add, modify, and delete firewall rules. Rules can be based on criteria like source/destination IP addresses, port numbers, or protocol types.
+### Rule Management
+Implements a system to define, add, modify, and delete firewall rules. Rules can be based on criteria like source/destination IP addresses, port numbers, or protocol types.
 
-- **Filtering and Blocking**: Compares incoming packets against defined rules and determines whether to allow or block a packet based on rule matching criteria. Implements appropriate actions such as dropping, logging, or forwarding.
+### Filtering and Blocking
+Compares incoming packets against defined rules and determines whether to allow or block a packet based on rule matching criteria. Implements appropriate actions such as dropping, logging, or forwarding.
 
-- **Logging and Alerting**: Provides a logging mechanism to record information about filtered packets, including timestamps, source/destination addresses, and actions taken. Alerting mechanisms, such as email notifications or system alerts, can be added for specific events.
+### Logging and Alerting
+Provides a logging mechanism to record information about filtered packets, including timestamps, source/destination addresses, and actions taken. Alerting mechanisms, such as email notifications or system alerts, can be added for specific events.
 
 ## Troubleshooting
 
-When troubleshooting the firewall code, consider the following steps:
+If you encounter issues with the firewall code, follow these steps for troubleshooting:
 
 1. **Review Rule Logic**: Double-check the rule logic and conditions. Ensure that the rule matching and action-taking mechanisms are implemented correctly.
 
@@ -32,7 +36,7 @@ When troubleshooting the firewall code, consider the following steps:
 
 7. **Compatibility and Dependencies**: Ensure that your code is compatible with the target operating system, network infrastructure, and any external libraries or dependencies used.
 
-If you encounter issues that persist after troubleshooting, consider seeking help from relevant forums, developer communities, or reaching out to network security experts.
+If the issues persist after troubleshooting, consider seeking help from relevant forums, developer communities, or consulting network security experts.
 
 ## Contributing
 
@@ -40,4 +44,4 @@ Contributions to this firewall project are welcome. Feel free to submit bug repo
 
 ## License
 
-This firewall project is released under the MIT License. Please review the license file for more details.
+This firewall project is released under the [insert chosen license]. Please review the license file for more details.
