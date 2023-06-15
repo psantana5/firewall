@@ -1,37 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    h1 {
-      color: #333;
-      font-size: 28px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 10px;
-    }
-    h2 {
-      color: #555;
-      font-size: 24px;
-      margin-top: 30px;
-    }
-    code {
-      font-family: Consolas, monospace;
-      font-size: 14px;
-      background-color: #f4f4f4;
-      padding: 5px;
-    }
-    pre {
-      background-color: #f4f4f4;
-      padding: 10px;
-      overflow: auto;
-    }
-  </style>
 </head>
 <body>
   <h1>🔥 Firewall Project</h1>
