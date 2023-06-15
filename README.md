@@ -20,7 +20,7 @@
   <p>To develop and run this firewall project, you will need:</p>
 
   <ul>
-    <li>🖥️ Operating System: Windows 10</li>
+    <li>🖥️ Operating System: Windows 11/10 or any Linux/GNU based OS.</li>
     <li>🔧 Compiler: MSYS with the GNU Compiler Collection (GCC)</li>
   </ul>
 
