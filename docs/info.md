@@ -44,4 +44,4 @@ Contributions to this firewall project are welcome. Feel free to submit bug repo
 
 ## License
 
-This firewall project is released under the [insert chosen license]. Please review the license file for more details.
+This firewall project is released under the MIT License. Please review the [LICENSE](LICENSE) file for more details.
