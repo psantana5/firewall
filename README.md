@@ -20,8 +20,8 @@
   <p>To develop and run this firewall project, you will need:</p>
 
   <ul>
-    <li>🖥️ Operating System: Any Linux/GNU based OS</li>
-    <li>🔧 Compiler: Linux/GNU compiler (GCC)</li>
+    <li>🖥️ Operating System: Windows 10, 11 and Linux/GNU based system (Ubuntu Recommended)</li>
+    <li>🔧 Compiler: Any Windows C++ Compiler or Linux/GNU compiler (GCC)</li>
   </ul>
 
   <h2>Getting Started</h2>
