@@ -6,6 +6,8 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <sstream>
+#include <limits>
+
 
 struct FirewallRule {
     std::string ipAddress;
@@ -248,21 +250,26 @@ bool authenticate(std::string& username, std::string& password) {
     }
 }
 
-int main() {
-    std::vector<FirewallRule> firewallRules;
-
-    std::string username, password;
-    if (!authenticate(username, password)) {
-        return 0;
-    }
-
+bool authenticate(const std::string& username, const std::string& password) {
     std::string enteredUsername, enteredPassword;
     std::cout << "Username: ";
     std::getline(std::cin, enteredUsername);
     std::cout << "Password: ";
     std::getline(std::cin, enteredPassword);
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the remaining newline character
+
     if (enteredUsername != username || enteredPassword != password) {
         std::cout << "Authentication failed. Exiting..." << std::endl;
+        return false;
+    }
+    return true;
+}
+
+int main() {
+    std::vector<FirewallRule> firewallRules;
+
+    std::string username, password;
+    if (!authenticate(username, password)) {
         return 0;
     }
 
