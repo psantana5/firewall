@@ -94,12 +94,5 @@
   <h2>License</h2>
 
   <p>This project is licensed under the <a href="LICENSE">MIT License</a>. Feel free to modify and distribute the code according to the terms of the license.</p>
-
-  <h2>Acknowledgments</h2>
-
-  <ul>
-    <li>🙏 The project structure and initial code inspiration: <a href="https://github.com/openai/chatgpt">OpenAI ChatGPT</a></li>
-    <li>📚 Helpful resources and tutorials on firewall development.</li>
-  </ul>
 </body>
 </html>
