@@ -21,7 +21,7 @@
 
   <ul>
     <li>🖥️ Operating System: Any Linux/GNU based OS</li>
-    <li>🔧 Compiler: MSYS with the GNU Compiler Collection (GCC)</li>
+    <li>🔧 Compiler: Linux/GNU compiler (GCC)</li>
   </ul>
 
   <h2>Getting Started</h2>
