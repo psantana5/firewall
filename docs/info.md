@@ -2,36 +2,6 @@
 <html>
 <head>
   <title>Firewall Rules</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-    }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-    h2 {
-      font-size: 18px;
-      margin-bottom: 8px;
-    }
-    h3 {
-      font-size: 16px;
-      margin-bottom: 6px;
-    }
-    p {
-      margin-bottom: 10px;
-    }
-    code {
-      font-family: Consolas, monospace;
-      font-size: 14px;
-      background-color: #f2f2f2;
-      padding: 2px;
-    }
-    .rule {
-      margin-bottom: 20px;
-    }
-  </style>
 </head>
 <body>
   <h1>Firewall Rules</h1>
