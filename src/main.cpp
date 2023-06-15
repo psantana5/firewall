@@ -7,6 +7,8 @@
 #include <openssl/sha.h>
 #include <sstream>
 #include <limits>
+#include <windows.h>
+
 
 
 struct FirewallRule {
@@ -211,9 +213,59 @@ std::string hashPassword(const std::string& password) {
     return ss.str();
 }
 
-
 bool authenticate(std::string& username, std::string& password) {
-    std::ifstream credentialsFile("credentials.txt");
+    std::string directoryPath = "shadow";
+    std::string filePath = directoryPath + "/credentials.txt";
+
+    // Create the hidden directory
+    if (!CreateDirectory(directoryPath.c_str(), NULL) && GetLastError() != ERROR_ALREADY_EXISTS) {
+        std::cout << "Failed to create the hidden directory. Exiting..." << std::endl;
+        return false;
+    }
+
+    // Make the directory hidden
+    if (!SetFileAttributes(directoryPath.c_str(), FILE_ATTRIBUTE_HIDDEN)) {
+        std::cout << "Failed to set the hidden attribute for the directory. Exiting..." << std::endl;
+        return false;
+    }
+
+    // Set appropriate permissions for the credentials file
+    SECURITY_ATTRIBUTES securityAttributes;
+    securityAttributes.nLength = sizeof(SECURITY_ATTRIBUTES);
+    securityAttributes.bInheritHandle = FALSE;
+
+    PSECURITY_DESCRIPTOR securityDescriptor = NULL;
+    if (!ConvertStringSecurityDescriptorToSecurityDescriptor(
+            "D:(A;OICI;GA;;;WD)", // Deny read access to everyone
+            SDDL_REVISION_1,
+            &securityDescriptor,
+            NULL)) {
+        std::cout << "Failed to convert security descriptor. Exiting..." << std::endl;
+        return false;
+    }
+
+    securityAttributes.lpSecurityDescriptor = securityDescriptor;
+
+    HANDLE fileHandle = CreateFile(
+        filePath.c_str(),
+        GENERIC_WRITE,
+        0,
+        &securityAttributes,
+        CREATE_NEW,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    if (fileHandle == INVALID_HANDLE_VALUE) {
+        std::cout << "Failed to create the credentials file. Exiting..." << std::endl;
+        LocalFree(securityDescriptor);
+        return false;
+    }
+
+    CloseHandle(fileHandle);
+    LocalFree(securityDescriptor);
+
+    std::ifstream credentialsFile(filePath);
     if (credentialsFile.is_open()) {
         std::getline(credentialsFile, username);
         std::string encryptedPassword;
@@ -231,7 +283,7 @@ bool authenticate(std::string& username, std::string& password) {
             return false;
         }
     } else {
-        std::ofstream newCredentialsFile("credentials.txt");
+        std::ofstream newCredentialsFile(filePath);
         if (newCredentialsFile.is_open()) {
             std::cout << "Welcome! Let's set up your firewall credentials." << std::endl;
             std::cout << "Enter a username: ";
@@ -248,21 +300,6 @@ bool authenticate(std::string& username, std::string& password) {
         }
         return false;
     }
-}
-
-bool authenticate(const std::string& username, const std::string& password) {
-    std::string enteredUsername, enteredPassword;
-    std::cout << "Username: ";
-    std::getline(std::cin, enteredUsername);
-    std::cout << "Password: ";
-    std::getline(std::cin, enteredPassword);
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the remaining newline character
-
-    if (enteredUsername != username || enteredPassword != password) {
-        std::cout << "Authentication failed. Exiting..." << std::endl;
-        return false;
-    }
-    return true;
 }
 
 int main() {
