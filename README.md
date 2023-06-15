@@ -51,9 +51,9 @@
   <ol start="6">
     <li>▶️ Run the compiled firewall program:</li>
   </ol>
-  #Windows Based OS
+  <p>Windows Based OS</p>
   <pre><code>./firewall.exe</code></pre>
-  #Linux Based OS
+  <p>Linux Based OS</p>
   <pre><code>./firewall</code></pre>
 
   <ol start="7">
