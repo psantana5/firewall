@@ -101,9 +101,5 @@
     <li>🙏 The project structure and initial code inspiration: <a href="https://github.com/openai/chatgpt">OpenAI ChatGPT</a></li>
     <li>📚 Helpful resources and tutorials on firewall development.</li>
   </ul>
-
-  <!-- Add an example picture -->
-  <img src="example.png" alt="Example Screenshot" width="400px" />
-
 </body>
 </html>
