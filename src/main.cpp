@@ -1,5 +1,10 @@
 #include <iostream>
 #include <limits>
+#include <pcap.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <netinet/if_ether.h>
 
 // Function prototypes
 void displayMainMenu();
@@ -89,7 +94,38 @@ void handleFilteringMenuChoice(int choice)
     {
         case 1:
             std::cout << "Packet Filtering feature selected.\n";
-            // Implement the logic for packet filtering
+            void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char){
+                struct ether_header *eth_header;
+                eth_header = (struct ether_header *)pkt_data;
+                printf("Source MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
+                  eth_header->ether_shost[0], eth_header->ether_shost[1],
+                  eth_header->ether_shost[2], eth_header->ether_shost[3],
+                  eth_header->ether_shost[4], eth_header->ether_shost[5]);
+                printf("Destination MAC: %02x:%02x:%02x:%02x:%02x:%02x\n ",
+                  eth_header->ether_dhost[0], eth_header->ether_dhost[1],
+                  eth_header->ether_dhost[2], eth_header->ether_dhost[3],
+                  eth_header->ether_dhost[4], eth_header->ether_dhost[5]);
+                printf("Type: %hu\n", eth_header->ether_type);
+            }
+
+            int main(int argc, char **argv){
+                char *dev = argv[1];
+                char errbuf [PCAP_ERRBUF_SIZE];
+                pcap_t *handle;
+                handle = pcap_open_live(dev, BUFSIZ, 1, 100, errrbuf);
+                if (handle == NULL){
+                    fprintf(strderr, "Couldn't open device %s; %s,\n", dev, errbuf);
+                    return (2);
+                }
+                int choice;
+                std::cout << "Enter your choice: ";
+                std::cin >> choice;
+
+                pcap_loop(handle, 0, packet_handler, NULL);
+                pcap_close(handle);
+                return(0);
+            
+            }
             break;
         case 2:
             std::cout << "Deep Packet Inspection feature selected.\n";
