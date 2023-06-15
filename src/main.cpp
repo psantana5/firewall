@@ -3,7 +3,9 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <openssl/evp.h>
 #include <openssl/sha.h>
+#include <sstream>
 
 struct FirewallRule {
     std::string ipAddress;
@@ -189,18 +191,24 @@ void printMenu() {
 }
 
 std::string hashPassword(const std::string& password) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, password.c_str(), password.length());
-    SHA256_Final(hash, &sha256);
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hashLength;
+
+    EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
+    const EVP_MD* md = EVP_sha256();
+
+    EVP_DigestInit_ex(mdctx, md, nullptr);
+    EVP_DigestUpdate(mdctx, password.c_str(), password.length());
+    EVP_DigestFinal_ex(mdctx, hash, &hashLength);
+    EVP_MD_CTX_free(mdctx);
 
     std::stringstream ss;
-    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+    for (unsigned int i = 0; i < hashLength; ++i) {
         ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
     }
     return ss.str();
 }
+
 
 bool authenticate(std::string& username, std::string& password) {
     std::ifstream credentialsFile("credentials.txt");
