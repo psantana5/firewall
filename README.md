@@ -51,8 +51,10 @@
   <ol start="6">
     <li>▶️ Run the compiled firewall program:</li>
   </ol>
-
+  #Windows Based OS
   <pre><code>./firewall.exe</code></pre>
+  #Linux Based OS
+  <pre><code>./firewall</code></pre>
 
   <ol start="7">
     <li>🔬 Test the firewall functionality by sending network traffic and observing the filtering based on the predefined rules.</li>
