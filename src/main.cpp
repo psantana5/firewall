@@ -1,6 +1,9 @@
 #include <iostream>
+#include <iomanip>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <openssl/sha.h>
 
 struct FirewallRule {
     std::string ipAddress;
@@ -169,99 +172,136 @@ void allowTrafficByPort(std::vector<FirewallRule>& firewallRules) {
     std::cout << "Allowed traffic for port " << port << ". Firewall rules updated." << std::endl;
 }
 
-void printMainMenu() {
+void printMenu() {
     std::cout << "=======================" << std::endl;
     std::cout << "Firewall Menu" << std::endl;
     std::cout << "=======================" << std::endl;
-    std::cout << "1. Manage Firewall Rules" << std::endl;
-    std::cout << "2. Block/Allow All Traffic" << std::endl;
-    std::cout << "3. Exit" << std::endl;
-    std::cout << "=======================" << std::endl;
-    std::cout << "Enter your choice: ";
-}
-
-void printFirewallRulesMenu() {
-    std::cout << "=======================" << std::endl;
-    std::cout << "Manage Firewall Rules" << std::endl;
-    std::cout << "=======================" << std::endl;
     std::cout << "1. Add Firewall Rule" << std::endl;
     std::cout << "2. Remove Firewall Rule" << std::endl;
-    std::cout << "3. Clear All Rules" << std::endl;
-    std::cout << "4. Print Rules" << std::endl;
-    std::cout << "5. Count Rules" << std::endl;
-    std::cout << "6. Search Rule by IP" << std::endl;
-    std::cout << "7. Go Back" << std::endl;
+    std::cout << "3. Clear All Firewall Rules" << std::endl;
+    std::cout << "4. Print Firewall Rules" << std::endl;
+    std::cout << "5. Count Firewall Rules" << std::endl;
+    std::cout << "6. Search Firewall Rule" << std::endl;
+    std::cout << "7. Block/Allow Traffic" << std::endl;
+    std::cout << "8. Exit" << std::endl;
     std::cout << "=======================" << std::endl;
-    std::cout << "Enter your choice: ";
+    std::cout << std::endl;
 }
 
-void printBlockAllowMenu() {
-    std::cout << "=======================" << std::endl;
-    std::cout << "Block/Allow All Traffic" << std::endl;
-    std::cout << "=======================" << std::endl;
-    std::cout << "1. Block All Traffic" << std::endl;
-    std::cout << "2. Allow All Traffic" << std::endl;
-    std::cout << "3. Block Traffic by IP Range" << std::endl;
-    std::cout << "4. Allow Traffic by IP Range" << std::endl;
-    std::cout << "5. Block Traffic by Protocol" << std::endl;
-    std::cout << "6. Allow Traffic by Protocol" << std::endl;
-    std::cout << "7. Block Traffic by Port" << std::endl;
-    std::cout << "8. Allow Traffic by Port" << std::endl;
-    std::cout << "9. Go Back" << std::endl;
-    std::cout << "=======================" << std::endl;
-    std::cout << "Enter your choice: ";
+std::string hashPassword(const std::string& password) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, password.c_str(), password.length());
+    SHA256_Final(hash, &sha256);
+
+    std::stringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+    }
+    return ss.str();
+}
+
+bool authenticate(std::string& username, std::string& password) {
+    std::ifstream credentialsFile("credentials.txt");
+    if (credentialsFile.is_open()) {
+        std::getline(credentialsFile, username);
+        std::string encryptedPassword;
+        std::getline(credentialsFile, encryptedPassword);
+        credentialsFile.close();
+
+        std::string inputPassword;
+        std::cout << "Enter your password: ";
+        std::getline(std::cin, inputPassword);
+
+        if (hashPassword(inputPassword) == encryptedPassword) {
+            return true;
+        } else {
+            std::cout << "Invalid password. Authentication failed." << std::endl;
+            return false;
+        }
+    } else {
+        std::ofstream newCredentialsFile("credentials.txt");
+        if (newCredentialsFile.is_open()) {
+            std::cout << "Welcome! Let's set up your firewall credentials." << std::endl;
+            std::cout << "Enter a username: ";
+            std::getline(std::cin, username);
+            std::string inputPassword;
+            std::cout << "Enter a password: ";
+            std::getline(std::cin, inputPassword);
+            std::string encryptedPassword = hashPassword(inputPassword);
+            newCredentialsFile << username << "\n" << encryptedPassword << std::endl;
+            newCredentialsFile.close();
+            std::cout << "Credentials set successfully. Please restart the firewall." << std::endl;
+        } else {
+            std::cout << "Failed to create credentials file. Exiting..." << std::endl;
+        }
+        return false;
+    }
 }
 
 int main() {
     std::vector<FirewallRule> firewallRules;
 
-    int mainChoice;
-    int firewallChoice;
-    int blockAllowChoice;
+    std::string username, password;
+    if (!authenticate(username, password)) {
+        return 0;
+    }
 
+    std::string enteredUsername, enteredPassword;
+    std::cout << "Username: ";
+    std::getline(std::cin, enteredUsername);
+    std::cout << "Password: ";
+    std::getline(std::cin, enteredPassword);
+    if (enteredUsername != username || enteredPassword != password) {
+        std::cout << "Authentication failed. Exiting..." << std::endl;
+        return 0;
+    }
+
+    int choice;
     do {
-        printMainMenu();
-        std::cin >> mainChoice;
+        printMenu();
+        std::cout << "Enter your choice (1-8): ";
+        std::cin >> choice;
+        std::cout << std::endl;
 
-        switch (mainChoice) {
+        switch (choice) {
             case 1:
-                do {
-                    printFirewallRulesMenu();
-                    std::cin >> firewallChoice;
-
-                    switch (firewallChoice) {
-                        case 1:
-                            addFirewallRule(firewallRules);
-                            break;
-                        case 2:
-                            removeFirewallRule(firewallRules);
-                            break;
-                        case 3:
-                            clearFirewallRules(firewallRules);
-                            break;
-                        case 4:
-                            printFirewallRules(firewallRules);
-                            break;
-                        case 5:
-                            countFirewallRules(firewallRules);
-                            break;
-                        case 6:
-                            searchFirewallRule(firewallRules);
-                            break;
-                        case 7:
-                            break;
-                        default:
-                            std::cout << "Invalid choice. Please try again." << std::endl;
-                            break;
-                    }
-                } while (firewallChoice != 7);
+                addFirewallRule(firewallRules);
                 break;
             case 2:
+                removeFirewallRule(firewallRules);
+                break;
+            case 3:
+                clearFirewallRules(firewallRules);
+                break;
+            case 4:
+                printFirewallRules(firewallRules);
+                break;
+            case 5:
+                countFirewallRules(firewallRules);
+                break;
+            case 6:
+                searchFirewallRule(firewallRules);
+                break;
+            case 7:
+                // Submenu for blocking/allowing traffic
+                int submenuChoice;
                 do {
-                    printBlockAllowMenu();
-                    std::cin >> blockAllowChoice;
+                    std::cout << "1. Block All Traffic" << std::endl;
+                    std::cout << "2. Allow All Traffic" << std::endl;
+                    std::cout << "3. Block Traffic by IP Range" << std::endl;
+                    std::cout << "4. Allow Traffic by IP Range" << std::endl;
+                    std::cout << "5. Block Traffic by Protocol" << std::endl;
+                    std::cout << "6. Allow Traffic by Protocol" << std::endl;
+                    std::cout << "7. Block Traffic by Port" << std::endl;
+                    std::cout << "8. Allow Traffic by Port" << std::endl;
+                    std::cout << "9. Go Back to Main Menu" << std::endl;
+                    std::cout << "Enter your choice (1-9): ";
+                    std::cin >> submenuChoice;
+                    std::cout << std::endl;
 
-                    switch (blockAllowChoice) {
+                    switch (submenuChoice) {
                         case 1:
                             blockAllTraffic(firewallRules);
                             break;
@@ -287,21 +327,23 @@ int main() {
                             allowTrafficByPort(firewallRules);
                             break;
                         case 9:
-                            break;
+                            break;  // Go back to the main menu
                         default:
                             std::cout << "Invalid choice. Please try again." << std::endl;
                             break;
                     }
-                } while (blockAllowChoice != 9);
+                    std::cout << std::endl;
+                } while (submenuChoice != 9);
                 break;
-            case 3:
+            case 8:
                 std::cout << "Exiting..." << std::endl;
                 break;
             default:
                 std::cout << "Invalid choice. Please try again." << std::endl;
                 break;
         }
-    } while (mainChoice != 3);
+        std::cout << std::endl;
+    } while (choice != 8);
 
     return 0;
 }
