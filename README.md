@@ -3,7 +3,7 @@
 <head>
 </head>
 <body>
-  <h1>🔥 Firewall Project</h1>
+  <h1>🔥 Basic Firewall Project</h1>
 
   <p>This repository contains my attempt at developing a firewall. The goal of this project is to create a functional firewall that can filter network traffic based on predefined rules.</p>
 
