@@ -11,7 +11,7 @@
 
   <ul>
     <li>📁 <code>firewall.cpp</code>: The main source code file for the firewall program.</li>
-    <li>📄 <code>rules.txt</code>: A text file that contains the predefined rules for the firewall.</li>
+    <li>📄 <code>rules.txt</code>: A text file that explains code structure and troubleshooting.</li>
     <li>📝 <code>README.md</code>: The documentation file explaining the project.</li>
   </ul>
 
