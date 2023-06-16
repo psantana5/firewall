@@ -7,6 +7,7 @@
 #include <openssl/sha.h>
 #include <sstream>
 #include <limits>
+#include <windows.h>
 
 
 struct FirewallRule {
@@ -211,17 +212,9 @@ std::string hashPassword(const std::string& password) {
     return ss.str();
 }
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <limits>
-
 std::string getHiddenPath(const std::string& filename) {
-    #ifdef _WIN32
-        return ".\\shadow\\" + filename;
-    #else
-        return "./shadow/" + filename;
-    #endif
+    std::string hiddenPath = "." + filename; // Prefix the filename with a dot to make it hidden
+    return hiddenPath;
 }
 
 bool authenticate(std::string& username, std::string& password) {
@@ -254,6 +247,11 @@ bool authenticate(std::string& username, std::string& password) {
             std::string encryptedPassword = hashPassword(inputPassword);
             newCredentialsFile << username << "\n" << encryptedPassword << std::endl;
             newCredentialsFile.close();
+
+            // Hide the credentials file
+            DWORD attributes = GetFileAttributesA(getHiddenPath("credentials.txt").c_str());
+            SetFileAttributesA(getHiddenPath("credentials.txt").c_str(), attributes | FILE_ATTRIBUTE_HIDDEN);
+
             std::cout << "Credentials set successfully. Please restart the firewall." << std::endl;
         } else {
             std::cout << "Failed to create credentials file. Exiting..." << std::endl;
@@ -261,7 +259,6 @@ bool authenticate(std::string& username, std::string& password) {
         return false;
     }
 }
-
 bool authenticate(const std::string& username, const std::string& password) {
     std::string enteredUsername, enteredPassword;
     std::cout << "Username: ";
